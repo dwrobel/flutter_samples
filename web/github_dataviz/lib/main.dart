@@ -2,6 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
+
+import 'package:flutter/services.dart' show rootBundle;
+
 import 'dart:collection';
 import 'dart:convert';
 
@@ -182,7 +187,7 @@ class _MainLayoutState extends State<MainLayout> with TickerProviderStateMixin {
 
   Future loadGitHubData() async {
     String contributorsJsonStr =
-        (await http.get("assets/github_data/contributors.json")).body;
+        (await rootBundle.loadString("github_data/contributors.json"));
     List jsonObjs = jsonDecode(contributorsJsonStr) as List;
     List<UserContribution> contributionList =
         jsonObjs.map((e) => UserContribution.fromJson(e)).toList();
@@ -191,25 +196,25 @@ class _MainLayoutState extends State<MainLayout> with TickerProviderStateMixin {
 
     int numWeeksTotal = contributionList[0].contributions.length;
 
-    String starsByWeekStr = (await http.get("assets/github_data/stars.tsv")).body;
+    String starsByWeekStr = (await rootBundle.loadString("github_data/stars.tsv"));
     List<StatForWeek> starsByWeekLoaded =
         summarizeWeeksFromTSV(starsByWeekStr, numWeeksTotal);
 
-    String forksByWeekStr = (await http.get("assets/github_data/forks.tsv")).body;
+    String forksByWeekStr = (await rootBundle.loadString("github_data/forks.tsv"));
     List<StatForWeek> forksByWeekLoaded =
         summarizeWeeksFromTSV(forksByWeekStr, numWeeksTotal);
 
-    String commitsByWeekStr = (await http.get("assets/github_data/commits.tsv")).body;
+    String commitsByWeekStr = (await rootBundle.loadString("github_data/commits.tsv"));
     List<StatForWeek> commitsByWeekLoaded =
         summarizeWeeksFromTSV(commitsByWeekStr, numWeeksTotal);
 
     String commentsByWeekStr =
-        (await http.get("assets/github_data/comments.tsv")).body;
+        (await rootBundle.loadString("github_data/comments.tsv"));
     List<StatForWeek> commentsByWeekLoaded =
         summarizeWeeksFromTSV(commentsByWeekStr, numWeeksTotal);
 
     String pullRequestActivityByWeekStr =
-        (await http.get("assets/github_data/pull_requests.tsv")).body;
+        (await rootBundle.loadString("github_data/pull_requests.tsv"));
     List<StatForWeek> pullRequestActivityByWeekLoaded =
         summarizeWeeksFromTSV(pullRequestActivityByWeekStr, numWeeksTotal);
 
@@ -249,5 +254,8 @@ class _MainLayoutState extends State<MainLayout> with TickerProviderStateMixin {
 }
 
 void main() {
+  // See https://github.com/flutter/flutter/wiki/Desktop-shells#target-platform-override
+  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+
   runApp(Center(child: MainLayout()));
 }
